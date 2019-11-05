@@ -6,20 +6,23 @@ Lightning Network Tools (lnt) is a toolset for interacting and managing your [ln
 
 Python 3 required.
 
-From source:
+### From source:
+
+> Note: `googleapis-common-protos` must be installed seperately due to a [bug](https://github.com/pypa/pipenv/issues/3886) in pipenv
 
 ```
+pip3 install googleapis-common-protos
 git clone --recursive https://github.com/thesis/lnt.git
 cd lnt
 python setup.py install
 ```
 
-From Pypi: 
+### From Pypi: 
 
-( googleapis-common-protos must be installed seperately due to a [bug](https://github.com/pypa/pipenv/issues/3886) in pipenv
+> Note: `googleapis-common-protos` must be installed seperately due to a [bug](https://github.com/pypa/pipenv/issues/3886) in pipenv
 
 ```
-pip3 install lnt, googleapis-common-protos
+pip3 install lnt googleapis-common-protos
 ```
 
 ## Feature progress

@@ -126,16 +126,16 @@ def view(ctx):
     return
 
 @view.command()
-# TODO: Add channel row indexing
-# @click.option('--index', '-i', metavar='INDEX', help="Channel index to output")
-@click.option('--csv', is_flag=True, help="Channel index to output")
-@click.option('--monthsago', '-m', metavar='MONTHS_AGO',
-    help="Shows events up to x months ago")
+@click.option('--id', metavar='CHAN_ID', help="Shows status of channel", type=int)
+@click.option('--csv', is_flag=True, help="Outputs in csv format")
+@click.option('--monthsago', '-m', metavar='MONTHS_AGO', help="Shows events up to x months ago")
 @click.option('--max', metavar='COLUMN', help="Sorts COLUMN by max", callback=validators.columns)
 @click.option('--min', metavar='COLUMN', help="Sorts COLUMN by min", callback=validators.columns)
 @click.pass_context
-def channel(ctx, csv, monthsago, max, min):
+def channel(ctx, id, csv, monthsago, max, min):
+
     ctx.sort = None
+    ctx.id = id
     ctx.csv = csv
     ctx.max = max
     ctx.min = min

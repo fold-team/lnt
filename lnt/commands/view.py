@@ -62,17 +62,7 @@ def channel(ctx):
             sorted_channels.reverse()
 
         if ctx.csv:
-            prnt_str = format_str.format(
-                            str(ch_id),
-                            str(channel['capacity']),
-                            str(channel['local_balance']),
-                            str(channel['local/cap']),
-                            str(channel['forwards']),
-                            str(len(channel['pending_htlcs'])),
-                            time.strftime('%Y-%m-%d %H:%M', time.gmtime(channel['last_update'])),
-                            str(num_channels_with_peer[channel['remote_pubkey']]),
-                            str(channel.get('alias', ''))
-                            )
+            header = ",".join(VIEW_CHANNEL_COLUMNS_DEFAULT)
         else:
             prnt_str = format_str.format(
                             str(ch_id).ljust(20),

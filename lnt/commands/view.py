@@ -64,17 +64,108 @@ def channel(ctx):
         if ctx.csv:
             header = ",".join(VIEW_CHANNEL_COLUMNS_DEFAULT)
         else:
-            prnt_str = format_str.format(
-                            str(ch_id).ljust(20),
-                            str(channel['capacity']).ljust(11),
-                            str(channel['local_balance']).ljust(10),
-                            str(channel['local/cap']).rjust(8),
-                            str(channel['forwards']).ljust(10).rjust(12),
-                            str(len(channel['pending_htlcs'])).ljust(15),
-                            str(time.strftime('%Y-%m-%d %H:%M', time.gmtime(channel['last_update']))).ljust(18),
-                            str(num_channels_with_peer[channel['remote_pubkey']]).ljust(18),
-                            str(channel.get('alias', ''))
-                            )
+            header = "\n" + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[0].ljust(21) + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[1].ljust(12) + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[2].ljust(11) + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[3] + "   " + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[4] + "   " + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[5] + "   " + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[6].ljust(19) + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[7].ljust(19) + \
+                VIEW_CHANNEL_COLUMNS_DEFAULT[8]
 
-        click.echo(prnt_str)
-    return
+        click.echo(header)
+
+        array = sorted_channels if ctx.sort else channels.keys()
+        for value in array:
+            ch_id = value[0] if ctx.sort else value
+            channel = channels[ch_id]
+            rows = []
+            format_str = "{},{},{},{}%,{},{},{},{},{}" if ctx.csv else "{} {} {} {}% {} {} {} {} {}"
+
+            if ctx.csv:
+                prnt_str = format_str.format(
+                                str(ch_id),
+                                str(channel['capacity']),
+                                str(channel['local_balance']),
+                                str(channel['local/cap']),
+                                str(channel['forwards']),
+                                str(len(channel['pending_htlcs'])),
+                                time.strftime('%Y-%m-%d %H:%M', time.gmtime(channel['last_update'])),
+                                str(num_channels_with_peer[channel['remote_pubkey']]),
+                                str(channel.get('alias', ''))
+                                )
+            else:
+                prnt_str = format_str.format(
+                                str(ch_id).ljust(20),
+                                str(channel['capacity']).ljust(11),
+                                str(channel['local_balance']).ljust(10),
+                                str(channel['local/cap']).rjust(8),
+                                str(channel['forwards']).ljust(10).rjust(12),
+                                str(len(channel['pending_htlcs'])).ljust(15),
+                                str(time.strftime('%Y-%m-%d %H:%M', time.gmtime(channel['last_update']))).ljust(18),
+                                str(num_channels_with_peer[channel['remote_pubkey']]).ljust(18),
+                                str(channel.get('alias', ''))
+                                )
+
+            click.echo(prnt_str)
+        return
+
+    def print_row(ctx, testnet):
+
+        def construct_row_to_print(channel):
+            pass # TODO
+
+        output_copy = None
+
+        from ptpdb import set_trace
+        set_trace()
+
+        try:
+            chan_info = getChanInfo(ctx, chan_id=ctx.id)
+            output_copy = construct_row_to_print(chan_info)
+        except Exception as error:
+            if "edge not found" in str(error):
+                # Not found in getchaninfo? It might be closed..
+                for ch in closedChannels(ctx):
+                    if ch.id == ctx.id:
+                        output_copy = construct_row_to_print(ch)
+                        break
+
+                if not output_copy:
+                    # Not in getChanInfo or closedChannels? Lastly could be in pending...
+                    pending_chans = pendingChannels(ctx)
+
+                    for ch in pending_chans['pending_open_channels']:
+                        if ch.id == ctx.id:
+                            output_copy = construct_row_to_print(chan_info)
+                            break
+
+                    for ch in pending_chans['pending_closing_channels']:
+                        if ch.id == ctx.id:
+                            output_copy = construct_row_to_print(chan_info)
+                            break
+
+                    for ch in pending_chans['pending_force_closing_channels']:
+                        if ch.id == ctx.id:
+                            output_copy = construct_row_to_print(chan_info)
+                            break
+
+                    for ch in pending_chans['waiting_close_channels']:
+                        if ch.id == ctx.id:
+                            output_copy = construct_row_to_print(chan_info)
+                            break
+                pass
+            else:
+                click.echo(error)
+                return
+
+        return
+
+    testnet = ctx.parent.parent.config['LNT'].get('testnet', False)
+
+    if ctx.id:
+        print_row(ctx, testnet)
+    else:
+        print_tables(ctx, testnet)

@@ -6,7 +6,7 @@ from decimal import Decimal
 import click
 
 # Mark Local imports
-from lnt.rpc.api import listChannels, getChanInfo, getForwardingHistory
+from lnt.rpc.api import listChannels, getChanInfo, getForwardingHistory, closedChannels, pendingChannels
 from lnt.constants import VIEW_CHANNEL_COLUMNS_DEFAULT, VIEW_CHANNEL_COLUMNS_MAP
 from lnt.commands.utils.utils import get_1ml_info
 

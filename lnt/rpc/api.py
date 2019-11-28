@@ -54,3 +54,33 @@ def closeChannel(ctx, channel_point, streaming:bool, force:bool=False, target_co
                 break
         else:
             return response.close_pending.txid[::-1].hex()
+
+def closedChannels(ctx, cooperative:bool=None, local_force:bool=None, remote_force:bool=None, breach:bool=None,
+    funding_canceled:bool=None, abandoned:bool=None):
+
+    request = ln.ClosedChannelsRequest(
+        cooperative=cooperative,
+        local_force=local_force,
+        remote_force=remote_force,
+        breach=breach,
+        funding_canceled=funding_canceled,
+        abandoned=abandoned,
+    )
+
+    # No normalization required for some reason
+    return ctx.stub.ClosedChannels(request, metadata=[('macaroon', ctx.macaroon)])
+
+def pendingChannels(ctx):
+    request = ln.PendingChannelsRequest()
+    response = ctx.stub.PendingChannels(request, metadata=[('macaroon'), macaroon)])
+
+    # Will probably have to normalize this. If you end up debugging here - that's why
+    return response
+    
+    # { 
+    #     "total_limbo_balance": <int64>,
+    #     "pending_open_channels": <array PendingOpenChannel>,
+    #     "pending_closing_channels": <array ClosedChannel>,
+    #     "pending_force_closing_channels": <array ForceClosedChannel>,
+    #     "waiting_close_channels": <array WaitingCloseChannel>,
+    # }
